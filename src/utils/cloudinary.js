@@ -14,48 +14,16 @@ export const uploadOnCloudinary = async (localFilePath) => {
     if (!localFilePath) {
       return null;
     }
-    const file = fs.readFileSync(localFilePath);
-    const result = await uploadFile(file);
-    console.log('File is uploaded on cloudinary')
-    return result;
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+    });
+    // file has been uploaded successfull
+    //console.log("file is uploaded on cloudinary ", response.url);
+    fs.unlinkSync(localFilePath);
+    return { url: response?.url };
   } catch (error) {
     fs.unlinkSync(localFilePath); //remove local file temporarily after error
     console.log(error);
     return null;
   }
-};
-
-export const uploadFile = (file) => {
-  return new Promise((resolve) => {
-    cloudinary.uploader.upload(file, (result) => {
-      resolve({
-        url: result.url,
-        public_id: result.public_id,
-      });
-    });
-  });
-};
-
-export const deleteFile = (public_id) => {
-  return new Promise((resolve) => {
-    cloudinary.uploader.destroy(public_id, (result) => {
-      resolve();
-    });
-  });
-};
-
-export const getFileUrl = (public_id) => {
-  return new Promise((resolve) => {
-    cloudinary.url(public_id, (result) => {
-      resolve(result);
-    });
-  });
-};
-
-export const getFile = (public_id) => {
-  return new Promise((resolve) => {
-    cloudinary.api.resource(public_id, (result) => {
-      resolve(result);
-    });
-  });
 };
