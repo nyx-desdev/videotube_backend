@@ -1,8 +1,7 @@
-import req from "express/lib/request";
 
 // const asyncHandler = (fn) => (req, res, next) => {};
 const asyncHandler = (requestHandler) => {
-  (req, res, next) => {
+  return (req, res, next) => {
     Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
   };
 };
