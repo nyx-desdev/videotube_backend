@@ -192,7 +192,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 
   try {
-    const decodedToken = jwt.verify(
+    const decodedToken = await jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
@@ -235,3 +235,27 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, error?.message || "Invalid refresh token");
   }
 });
+
+export const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const accessToken = req.cookies?.accessToken;
+  const currentPassword = req.body.currentPassword;
+  const newPassword = req.body.newPassword;
+  console.log(currentPassword, newPassword);
+  console.log(req.user);
+
+  const user = await User.findById(req.user?.id);
+  console.log("uu", user);
+
+  const isPasswordCorrect = await user.isPasswordCorrect(currentPassword);
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Invalid old password");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+
