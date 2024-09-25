@@ -259,3 +259,35 @@ export const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User fetched successfully"));
+});
+
+export const updateAccountDetails = asyncHandler(async (req, res) => {
+  // take things to update from body
+  // it can be fullName or email
+  const { fullName, email } = req.body;
+
+  if (!fullName || !email) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        fullName,
+        email: email,
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  // console.log('updated User', updatedUser)
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "Account updated successfully"));
+});
