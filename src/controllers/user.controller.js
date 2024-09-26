@@ -325,14 +325,12 @@ export const updateUserAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Avatar updated successfully"));
 });
 
-const updateUserCoverImage = asyncHandler(async (req, res) => {
+export const updateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
 
   if (!coverImageLocalPath) {
     throw new ApiError(400, "Cover image file is missing");
   }
-
-  //TODO: delete old image - assignment
 
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
